@@ -46,12 +46,6 @@ def extract_lbp_features(image):
 
 # Step 2: Split data into training and testing sets
 def split_data(features, labels):
-    # Ensure that there are at least 2 fingerprint IDs with 8 samples each
-    unique_labels, label_counts = np.unique(labels, return_counts=True)
-    if np.sum(label_counts == 8) < 2:
-        raise ValueError(
-            "Insufficient samples for splitting. Ensure that there are at least 2 fingerprint IDs with 8 samples each.")
-
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.4, random_state=42,
                                                         stratify=labels)
     return X_train, X_test, y_train, y_test
@@ -71,10 +65,16 @@ def evaluate_classifier(classifier, X_test, y_test):
     return accuracy
 
 
-# Example usage
-dataset_directory = r"C:\Users\ASUS\Desktop\Python tingz\FingerprintAuthenticationSystem\FVC_Dataset"
-features, labels = read_fingerprint_images(dataset_directory)
-X_train, X_test, y_train, y_test = split_data(features, labels)
-classifier = train_classifier(X_train, y_train)
-accuracy = evaluate_classifier(classifier, X_test, y_test)
-print("Accuracy:", accuracy)
+def main():
+
+    dataset_directory = r"C:\Users\ASUS\Desktop\Python tingz\FingerprintAuthenticationSystem\FVC_Dataset"
+    features, labels = read_fingerprint_images(dataset_directory)
+    X_train, X_test, y_train, y_test = split_data(features, labels)
+    classifier = train_classifier(X_train, y_train)
+    accuracy = evaluate_classifier(classifier, X_test, y_test)
+    print("Accuracy:", accuracy)
+
+    if __name__ == "__main__":
+        main()
+
+
