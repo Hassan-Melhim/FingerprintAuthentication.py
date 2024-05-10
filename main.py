@@ -79,11 +79,31 @@ def evaluate_classifier(classifier, X_test, y_test):
     accuracy = accuracy_score(y_test, y_pred)
     return accuracy
 
+def rename_tif_images(directory, num_fingerprints, impressions_per_fingerprint):
+    fingerprint_count = 1
+    impression_count = 1
+    for filename in os.listdir(directory):
+        if filename.endswith(".tif"):
+            old_path = os.path.join(directory, filename)
+            new_filename = f"1{fingerprint_count}{impression_count}.tif"
+            new_path = os.path.join(directory, new_filename)
+            os.rename(old_path, new_path)
+            impression_count += 1
+            if impression_count > impressions_per_fingerprint:
+                impression_count = 1
+                fingerprint_count += 1
+                if fingerprint_count > num_fingerprints:
+                    break
+
+
+rename_tif_images(r"C:\Users\ASUS\Desktop\tt",
+                  10, 8)
+
 
 #Example usage
-dataset_directory = r"C:\Users\ASUS\Desktop\Python tingz\FingerprintAuthenticationSystem\FVC_Dataset"
-features, labels = read_fingerprint_images(dataset_directory)
-X_train, X_test, y_train, y_test = split_data(features, labels)
-classifier = train_classifier(X_train, y_train)
-accuracy = evaluate_classifier(classifier, X_test, y_test)
-print("Accuracy:", accuracy)
+# dataset_directory = r"C:\Users\ASUS\Desktop\Python tingz\FingerprintAuthenticationSystem\FVC_Dataset"
+# features, labels = read_fingerprint_images(dataset_directory)
+# X_train, X_test, y_train, y_test = split_data(features, labels)
+# classifier = train_classifier(X_train, y_train)
+# accuracy = evaluate_classifier(classifier, X_test, y_test)
+# print("Accuracy:", accuracy)
