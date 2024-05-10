@@ -11,7 +11,7 @@ from skimage.feature import local_binary_pattern
 def read_fingerprint_images(directory):
     fingerprints = []
     labels = []
-    fingerprint_counts = {}  # Dictionary to store the count of samples for each fingerprint ID
+    enrolled_users = [1, 4, 7, 12, 19]
     for filename in os.listdir(directory):
         if filename.endswith(".tif"):
             fingerprint_id = int(filename[:-4])  # Remove ".tif" extension and convert to integer
@@ -19,25 +19,16 @@ def read_fingerprint_images(directory):
             image = Image.open(image_path)
             lbp_features = extract_lbp_features(image)
             fingerprints.append(lbp_features)
-            labels.append(fingerprint_id)
-            # Increment the count for the current fingerprint ID
-            fingerprint_counts[fingerprint_id] = fingerprint_counts.get(fingerprint_id, 0) + 1
 
-    # Filter out fingerprint IDs with fewer than 8 samples
-    filtered_features = []
-    filtered_labels = []
-    for feature, label in zip(fingerprints, labels):
-        if fingerprint_counts[label] == 8:
-            filtered_features.append(feature)
-            filtered_labels.append(label)
+            if fingerprint_id / 10 == enrolled_users:
+                labels.append(1)
+            else:
+                labels.append(0)
 
-    return np.array(filtered_features), np.array(filtered_labels)
+    return np.array(fingerprints), np.array(labels)
 
 
 def extract_lbp_features(image):
-    # Convert the image to grayscale if it's not already
-    if image.mode != 'L':
-        image = image.convert('L')
 
     # Convert PIL image to numpy array
     image_array = np.array(image)
@@ -79,31 +70,11 @@ def evaluate_classifier(classifier, X_test, y_test):
     accuracy = accuracy_score(y_test, y_pred)
     return accuracy
 
-def rename_tif_images(directory, num_fingerprints, impressions_per_fingerprint):
-    fingerprint_count = 1
-    impression_count = 1
-    for filename in os.listdir(directory):
-        if filename.endswith(".tif"):
-            old_path = os.path.join(directory, filename)
-            new_filename = f"1{fingerprint_count}{impression_count}.tif"
-            new_path = os.path.join(directory, new_filename)
-            os.rename(old_path, new_path)
-            impression_count += 1
-            if impression_count > impressions_per_fingerprint:
-                impression_count = 1
-                fingerprint_count += 1
-                if fingerprint_count > num_fingerprints:
-                    break
 
-
-rename_tif_images(r"C:\Users\ASUS\Desktop\tt",
-                  10, 8)
-
-
-#Example usage
-# dataset_directory = r"C:\Users\ASUS\Desktop\Python tingz\FingerprintAuthenticationSystem\FVC_Dataset"
-# features, labels = read_fingerprint_images(dataset_directory)
-# X_train, X_test, y_train, y_test = split_data(features, labels)
-# classifier = train_classifier(X_train, y_train)
-# accuracy = evaluate_classifier(classifier, X_test, y_test)
-# print("Accuracy:", accuracy)
+# Example usage
+dataset_directory = r"C:\Users\ASUS\Desktop\Python tingz\FingerprintAuthenticationSystem\FVC_Dataset"
+features, labels = read_fingerprint_images(dataset_directory)
+X_train, X_test, y_train, y_test = split_data(features, labels)
+classifier = train_classifier(X_train, y_train)
+accuracy = evaluate_classifier(classifier, X_test, y_test)
+print("Accuracy:", accuracy)
